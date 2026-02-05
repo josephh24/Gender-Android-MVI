@@ -22,11 +22,11 @@ class GenderUserRepositoryImpl @Inject constructor(
             .getGenderUserEntity(name)
             .map { genderUserEntity ->
                 delay(200)
-                genderUserEntity.asExternalModel()
+                genderUserEntity.asExternalModel() //from DB
             }
             .retryWhen { cause, attempt ->
                 if (cause is NullPointerException && attempt < 1) {
-                    fetchGenderUser(name)
+                    fetchGenderUser(name) // network
                     true
                 } else {
                     false
@@ -36,9 +36,9 @@ class GenderUserRepositoryImpl @Inject constructor(
     }
 
     private suspend fun fetchGenderUser(name: String): GenderUser {
-        return networkDataSource.fetchNetworkGenderUser(name)
-            .asEntity()
-            .also { localDatabaseResource.saveGenderUserEntity(it) }
-            .asExternalModel()
+        return networkDataSource.fetchNetworkGenderUser(name) // network
+            .asEntity() // obj to DB format
+            .also { localDatabaseResource.saveGenderUserEntity(it) } //save in DB
+            .asExternalModel() // obj to domain format
     }
 }
