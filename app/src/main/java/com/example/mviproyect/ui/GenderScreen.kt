@@ -5,10 +5,14 @@ import androidx.compose.animation.AnimatedContent
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.systemBars
+import androidx.compose.foundation.layout.windowInsetsTopHeight
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material3.Card
@@ -27,6 +31,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
@@ -62,6 +67,10 @@ fun GenderScreen(
             .padding(horizontal = 15.dp, vertical = 10.dp),
         verticalArrangement = Arrangement.spacedBy(10.dp)
     ) {
+        Spacer(
+            modifier = Modifier
+                .windowInsetsTopHeight(WindowInsets.systemBars)
+        )
         Text(
             modifier = Modifier.fillMaxWidth(),
             textAlign = TextAlign.Center,
@@ -86,13 +95,16 @@ fun EditTextName(searchGender: (String) -> Unit) {
     var name by remember { mutableStateOf("") }
 
     TextField(
-        modifier = Modifier.fillMaxWidth(),
+        modifier = Modifier.fillMaxWidth().testTag("NameTextField"),
         value = name,
         onValueChange = { name = it },
         label = { Text("Name") },
         maxLines = 1,
         trailingIcon = {
-            IconButton(onClick = { searchGender(name) }) {
+            IconButton(
+                modifier = Modifier.testTag("SearchButton"),
+                onClick = { searchGender(name) }
+            ) {
                 Icon(imageVector = Icons.Filled.Search, contentDescription = null)
             }
         },
@@ -113,8 +125,11 @@ fun GenderUserInfo(
         Box(modifier = modifier) {
             if (targetState) {
                 CircularProgressIndicator(
-                    modifier = Modifier.align(Alignment.Center)
+                    modifier = Modifier
+                        .align(Alignment.Center)
+                        .testTag("Loading")
                 )
+
             } else {
                 genderUser?.let { user ->
                     Card(
